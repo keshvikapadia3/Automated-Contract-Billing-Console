@@ -16,7 +16,7 @@ const InvoicePage = () => {
 
   return (
     <Box sx={{ p: 4, pt: 6 }}>
-      <Box sx={{ mb: 4 }}>
+      <Box sx={{ mb: 4}}>
         <Typography variant="h4" sx={{ fontWeight: "bold", color: "#003A70" }}>Invoice Report</Typography>
         <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
           Total billing overview across all contracts

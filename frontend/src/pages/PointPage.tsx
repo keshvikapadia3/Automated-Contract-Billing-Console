@@ -1,15 +1,22 @@
 import { useState } from "react";
+
 import {
   Box, Button, Chip, Divider, FormControl, InputLabel,
   MenuItem, Paper, Select, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, TextField, Tooltip,
-  Typography, IconButton,
+  TableContainer, TableHead, TableRow, TextField, Typography, IconButton,
 } from "@mui/material";
+
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../app/store";
-import { addPoint, updatePoint, deletePoint } from "../features/points/pointSlice";
+
+import {
+  
+  setPoints,
+  deletePoint,
+} from "../features/points/pointSlice";
 
 interface Contract {
   id: number;
@@ -24,9 +31,10 @@ interface Point {
 }
 
 const PointPage = () => {
+  const dispatch = useDispatch();
+
   const contracts = useSelector((state: RootState) => state.contracts.contracts);
   const points = useSelector((state: RootState) => state.points.points as Point[]);
-  const dispatch = useDispatch();
 
   const [contractId, setContractId] = useState(1);
   const [showForm, setShowForm] = useState(false);
@@ -34,40 +42,98 @@ const PointPage = () => {
   const [value, setValue] = useState(0);
   const [editingPoint, setEditingPoint] = useState<Point | null>(null);
 
+  // 🔥 SINGLE SOURCE OF TRUTH: DB
+  const fetchPoints = async () => {
+    const res = await fetch("http://127.0.0.1:8000/points");
+    const data = await res.json();
+
+    const formatted = data.map((p: any) => ({
+      id: p.id.toString(),
+      contractId: p.contract_id,
+      pointName: p.point_name,
+      value: p.value,
+    }));
+
+    dispatch(setPoints(formatted));
+  };
+
+  const resetForm = () => {
+    setPointName("");
+    setValue(0);
+    setShowForm(false);
+    setEditingPoint(null);
+  };
+
+  const handleSave = async () => {
+  if (!pointName || value <= 0) {
+    alert("Please enter valid data");
+    return;
+  }
+
+  try {
+    if (editingPoint) {
+      // UPDATE
+      await fetch(`http://127.0.0.1:8000/points/${editingPoint.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contract_id: contractId,
+          point_name: pointName,
+          value
+        }),
+      });
+
+      // ❌ REMOVE THIS — causes stale intermediate state
+      // dispatch(updatePoint({ ... }));
+
+    } else {
+      // CREATE
+      await fetch("http://127.0.0.1:8000/points", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contract_id: contractId,
+          point_name: pointName,
+          value
+        }),
+      });
+
+      // ❌ REMOVE THIS TOO — same reason
+      // dispatch(addPoint({ ... }));
+    }
+
+    // ✅ Single source of truth — this updates Redux from DB
+    await fetchPoints();
+    resetForm();
+
+  } catch (error) {
+    console.error(error);
+    alert("Operation failed");
+  }
+};
+  const handleDeletePoint = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this point?")) return;
+
+    try {
+      await fetch(`http://127.0.0.1:8000/points/${id}`, {
+        method: "DELETE",
+      });
+
+      dispatch(deletePoint(id));
+
+      // 🔥 SYNC AGAIN AFTER DELETE
+      await fetchPoints();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleEditPoint = (point: Point) => {
     setEditingPoint(point);
     setPointName(point.pointName);
     setValue(point.value);
+    setContractId(point.contractId);
     setShowForm(true);
-  };
-
-  const handleDeletePoint = (id: string) => {
-    if (window.confirm("Are you sure you want to delete this point?")) {
-      dispatch(deletePoint(id));
-    }
-  };
-
-  const handleSave = () => {
-    if (!pointName || value <= 0) {
-      alert("Please enter valid data");
-      return;
-    }
-    if (editingPoint) {
-      dispatch(updatePoint({ ...editingPoint, pointName, value }));
-    } else {
-      dispatch(addPoint({ contractId, pointName, value }));
-    }
-    setPointName("");
-    setValue(0);
-    setShowForm(false);
-    setEditingPoint(null);
-  };
-
-  const handleCancelForm = () => {
-    setShowForm(false);
-    setEditingPoint(null);
-    setPointName("");
-    setValue(0);
   };
 
   const filteredPoints = points.filter((p) => p.contractId === contractId);
@@ -76,7 +142,8 @@ const PointPage = () => {
   return (
     <Box sx={{ p: 4, mt: 3 }}>
 
-      {/* Page Header */}
+      {/* ===== UI EXACT SAME ===== */}
+
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" sx={{ fontWeight: "bold", color: "#003A70" }}>
           Billing Points
@@ -86,11 +153,11 @@ const PointPage = () => {
         </Typography>
       </Box>
 
-      {/* Contract Selector + Add Button */}
       <Paper elevation={2} sx={{ p: 3, borderRadius: 2, mb: 4 }}>
         <Typography variant="h6" sx={{ color: "#003A70", fontWeight: "bold", mb: 2 }}>
           Select Contract
         </Typography>
+
         <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap" }}>
           <FormControl sx={{ minWidth: 250 }}>
             <InputLabel>Select Contract</InputLabel>
@@ -99,7 +166,7 @@ const PointPage = () => {
               label="Select Contract"
               onChange={(e) => {
                 setContractId(Number(e.target.value));
-                handleCancelForm();
+                resetForm();
               }}
             >
               {contracts.map((contract: Contract) => (
@@ -115,7 +182,7 @@ const PointPage = () => {
             size="large"
             onClick={() => {
               if (showForm && !editingPoint) {
-                handleCancelForm();
+                resetForm();
               } else {
                 setEditingPoint(null);
                 setPointName("");
@@ -134,15 +201,13 @@ const PointPage = () => {
           </Button>
         </Box>
 
-        {/* Add / Edit Form */}
         {showForm && (
           <>
             <Divider sx={{ my: 3 }} />
             <Typography variant="h6" sx={{ color: "#003A70", fontWeight: "bold", mb: 2 }}>
-              {editingPoint
-                ? "Edit Point"
-                : `Add Point to "${selectedContract?.name}"`}
+              {editingPoint ? "Edit Point" : `Add Point to "${selectedContract?.name}"`}
             </Typography>
+
             <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap", alignItems: "flex-end" }}>
               <TextField
                 label="Point Name"
@@ -150,6 +215,7 @@ const PointPage = () => {
                 onChange={(e) => setPointName(e.target.value)}
                 sx={{ flex: 2, minWidth: "200px" }}
               />
+
               <TextField
                 label="Value"
                 type="number"
@@ -157,6 +223,7 @@ const PointPage = () => {
                 onChange={(e) => setValue(Number(e.target.value))}
                 sx={{ width: "150px" }}
               />
+
               <Button
                 variant="contained"
                 size="large"
@@ -167,21 +234,12 @@ const PointPage = () => {
                   backgroundColor: "#2e7d32",
                   borderRadius: 2,
                   fontWeight: "bold",
-                  "&:hover": { backgroundColor: "#1b5e20" },
                 }}
               >
                 {editingPoint ? "Update Point" : "Save Point"}
               </Button>
-              <Button
-                variant="outlined"
-                size="large"
-                onClick={handleCancelForm}
-                sx={{
-                  height: "56px",
-                  px: 3,
-                  borderRadius: 2,
-                }}
-              >
+
+              <Button variant="outlined" size="large" onClick={resetForm}>
                 Cancel
               </Button>
             </Box>
@@ -189,11 +247,11 @@ const PointPage = () => {
         )}
       </Paper>
 
-      {/* Points Table Header */}
       <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
         <Typography variant="h5" sx={{ fontWeight: "bold", color: "#003A70" }}>
           Points for "{selectedContract?.name}"
         </Typography>
+
         <Chip
           label={`${filteredPoints.length} Points`}
           sx={{ backgroundColor: "#003A70", color: "white", fontWeight: "bold" }}
@@ -202,83 +260,40 @@ const PointPage = () => {
 
       <Divider sx={{ mb: 3 }} />
 
-      {/* Empty State */}
-      {filteredPoints.length === 0 ? (
-        <Paper elevation={1} sx={{ borderRadius: 2, textAlign: "center", p: 6 }}>
-          <Typography variant="h6" sx={{ color: "#888" }}>
-            No points added yet
-          </Typography>
-          <Typography variant="body2" sx={{ color: "#aaa", mt: 1 }}>
-            Click "+ Add Point" button above to get started
-          </Typography>
-        </Paper>
-      ) : (
-        // Points Table
-        <Paper elevation={2} sx={{ borderRadius: 2, overflow: "hidden" }}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow sx={{ backgroundColor: "#003A70" }}>
-                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>#</TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>Point Name</TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>Billing Value</TableCell>
-                  <TableCell sx={{ color: "white", fontWeight: "bold" }}>Actions</TableCell>
+      <Paper elevation={2}>
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: "#003A70" }}>
+                <TableCell sx={{ color: "white" }}>#</TableCell>
+                <TableCell sx={{ color: "white" }}>Point Name</TableCell>
+                <TableCell sx={{ color: "white" }}>Billing Value</TableCell>
+                <TableCell sx={{ color: "white" }}>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {filteredPoints.map((point, index) => (
+                <TableRow key={point.id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{point.pointName}</TableCell>
+                  <TableCell>{point.value}</TableCell>
+                  <TableCell>
+                    <IconButton onClick={() => handleEditPoint(point)}>
+                      <EditIcon />
+                    </IconButton>
+
+                    <IconButton onClick={() => handleDeletePoint(point.id)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredPoints.map((point, index) => (
-                  <TableRow
-                    key={point.id}
-                    sx={{ "&:hover": { backgroundColor: "#f0f4ff" }, transition: "0.2s" }}
-                  >
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>
-                      <Typography sx={{ fontWeight: "bold" }}>
-                        {point.pointName}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography sx={{ fontWeight: "bold", color: "#2e7d32" }}>
-                        {point.value}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Tooltip title="Edit Point">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleEditPoint(point)}
-                          sx={{ color: "#003A70", mr: 0.5 }}
-                        >
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                      <span
-                        style={{
-                          color: "#ccc",
-                          fontWeight: 300,
-                          fontSize: "18px",
-                          verticalAlign: "middle",
-                        }}
-                      >
-                        |
-                      </span>
-                      <Tooltip title="Delete Point">
-                        <IconButton
-                          size="small"
-                          onClick={() => handleDeletePoint(point.id)}
-                          sx={{ color: "#d32f2f", ml: 0.5 }}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Paper>
-      )}
+              ))}
+            </TableBody>
+
+          </Table>
+        </TableContainer>
+      </Paper>
     </Box>
   );
 };

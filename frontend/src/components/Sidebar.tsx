@@ -10,8 +10,8 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { logout } from "../features/auth/authSlice";
-import { clearPoints } from "../features/points/pointSlice";
-
+// 22import { clearPoints } from "../features/points/pointSlice";
+import { setPoints } from "../features/points/pointSlice";
 const DRAWER_WIDTH = 240;
 
 interface Props {
@@ -38,7 +38,8 @@ const Sidebar = ({ open, onClose }: Props) => {
 
   const handleLogout = () => {
     dispatch(logout());
-    dispatch(clearPoints());
+    // dispatch(clearPoints());
+    dispatch(setPoints([]));
     navigate("/");
     onClose();
   };

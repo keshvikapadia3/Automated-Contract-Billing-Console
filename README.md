@@ -161,71 +161,114 @@ npm run preview
 ```
 Automated-Contract-Billing-Console/
 │
-├── node_modules/
-│
-├── public/
-│   ├── favicon.svg
-│   └── icons.svg
-│
-├── src/
+├── frontend/
 │   │
-│   ├── app/
-│   │   └── store.ts
+│   ├── public/
+│   │   ├── favicon.svg
+│   │   └── icons.svg
 │   │
-│   ├── assets/
-│   │   ├── hero.png
-│   │   ├── Linde-Logo.png
-│   │   ├── react.svg
-│   │   └── vite.svg
-│   │
-│   ├── components/
-│   │   ├── Footer.tsx
-│   │   ├── Header.tsx
-│   │   ├── Layout.tsx
-│   │   ├── ProtectedRoute.tsx
-│   │   └── Sidebar.tsx
-│   │
-│   ├── features/
+│   ├── src/
 │   │   │
-│   │   ├── auth/
-│   │   │   └── authSlice.ts
+│   │   ├── app/
+│   │   │   └── store.ts
 │   │   │
-│   │   ├── contracts/
-│   │   │   └── contractSlice.ts
+│   │   ├── assets/
+│   │   │   ├── hero.png
+│   │   │   ├── Linde-Logo.png
+│   │   │   ├── react.svg
+│   │   │   └── vite.svg
 │   │   │
-│   │   └── points/
-│   │       └── pointSlice.ts
-│   │
-│   ├── hooks/
-│   │   └── reduxHooks.ts
-│   │
-│   ├── pages/
-│   │   ├── ContractPage.tsx
-│   │   ├── Dashboard.tsx
-│   │   ├── InvoicePage.tsx
-│   │   ├── Login.tsx
-│   │   └── PointPage.tsx
-│   │
-│   ├── routes/
-│   │   └── AppRoutes.tsx
-│   │
-│   ├── types/
-│   │   └── index.ts
-│   │
-│   ├── App.tsx
-│   ├── index.css
-│   └── main.tsx
+│   │   ├── components/
+│   │   │   ├── Header.tsx
+│   │   │   ├── Footer.tsx
+│   │   │   ├── Layout.tsx
+│   │   │   ├── Sidebar.tsx
+│   │   │   └── ProtectedRoute.tsx
+│   │   │
+│   │   ├── features/
+│   │   │   │   
+│   │   │   ├── auth/
+│   │   │   │   └── authSlice.ts
+│   │   │   │
+│   │   │   ├── contracts/
+│   │   │   │   └── contractSlice.ts
+│   │   │   │
+│   │   │   └── points/
+│   │   │       └── pointSlice.ts
+│   │   │
+│   │   ├── hooks/
+│   │   │   └── reduxHooks.ts
+│   │   │
+│   │   ├── pages/
+│   │   │   ├── Login.tsx
+│   │   │   ├── Dashboard.tsx
+│   │   │   ├── ContractPage.tsx
+│   │   │   ├── PointPage.tsx
+│   │   │   └── InvoicePage.tsx
+│   │   │
+│   │   ├── routes/
+│   │   │   └── AppRoutes.tsx
+│   │   │
+│   │   ├── services/
+│   │   │   └── api.ts
+│   │   │
+│   │   ├── types/
+│   │   │   └── index.ts
+│   │   │
+│   │   ├── App.tsx
+│   │   ├── main.tsx
+│   │   └── index.css
+│   │   
+│   ├── .gitignore
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── README.md
+│   ├── tsconfig.app.json
+│   ├── tsconfig.json
+│   ├── tsconfig.node.json
+│   └── vite.config.ts
 │
-├── .gitignore
-├── eslint.config.js
-├── index.html
-├── package-lock.json
-├── package.json
-├── README.md
-├── tsconfig.app.json
-├── tsconfig.json
-├── tsconfig.node.json
-└── vite.config.ts
+├── backend/
+│   │
+│   ├── .gitignore
+│   ├── requirements.txt
+│   ├── .env
+│   │
+│   └── app/
+│       │
+│       ├── main.py
+│       │
+│       ├── core/
+│       │   ├── config.py
+│       │   ├── database.py
+│       │   └── security.py
+│       │
+│       ├── models/
+│       │   ├── user.py
+│       │   ├── contract.py
+│       │   └── point.py
+│       │
+│       ├── schemas/
+│       │   ├── user.py
+│       │   ├── contract.py
+│       │   ├── point.py
+│       │   └── invoice.py
+│       │
+│       ├── routers/
+│       │   ├── auth.py
+│       │   ├── contract.py
+│       │   ├── point.py
+│       │   └── invoice.py
+│       │
+│       └── services/
+│           ├── auth_service.py
+│           ├── contract_service.py
+│           ├── point_service.py
+│           └── invoice_service.py
+│
+└── README.md
 ```
 
 ---

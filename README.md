@@ -371,7 +371,6 @@ Update this if deploying the backend to a different host or port.
 
 ---
 
-
 ## 📸 Screenshots
 
 | Page | Description |

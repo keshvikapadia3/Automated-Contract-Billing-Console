@@ -38,7 +38,6 @@ Managing contracts manually across spreadsheets leads to missed expiry dates, in
 ---
 
 ## 🛠 Tech Stack
-## 🛠 Tech Stack
 
 ### Frontend
 

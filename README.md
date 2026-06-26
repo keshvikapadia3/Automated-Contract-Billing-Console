@@ -347,17 +347,6 @@ The app will be available at `http://localhost:5173`
 
 ---
 
-## 📜 Available Scripts
-
-| Command | Description |
-|---|---|
-| `npm run dev` | Start local development server (Vite) |
-| `npm run build` | Build the app for production |
-| `npm run preview` | Preview the production build locally |
-| `npm run lint` | Run ESLint for code quality checks |
-| `npm run type-check` | Run TypeScript compiler checks |
-
----
 
 ### Frontend — Backend URL
 

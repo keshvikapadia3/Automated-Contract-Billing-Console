@@ -356,6 +356,7 @@ The app will be available at `http://localhost:5173`
 | `npm run preview` | Preview the production build locally |
 | `npm run lint` | Run ESLint for code quality checks |
 | `npm run type-check` | Run TypeScript compiler checks |
+
 ---
 
 ### Frontend — Backend URL

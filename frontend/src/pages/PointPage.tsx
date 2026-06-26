@@ -5,7 +5,7 @@ import {
   MenuItem, Paper, Select, Table, TableBody, TableCell,
   TableContainer, TableHead, TableRow, TextField, Typography, IconButton,
 } from "@mui/material";
-
+import Tooltip from "@mui/material/Tooltip";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
@@ -279,14 +279,37 @@ const PointPage = () => {
                   <TableCell>{point.pointName}</TableCell>
                   <TableCell>{point.value}</TableCell>
                   <TableCell>
-                    <IconButton onClick={() => handleEditPoint(point)}>
-                      <EditIcon />
-                    </IconButton>
+  <Tooltip title="Edit Point">
+    <IconButton
+      size="small"
+      onClick={() => handleEditPoint(point)}
+      sx={{ color: "#003A70", mr: 0.5 }}
+    >
+      <EditIcon fontSize="small" />
+    </IconButton>
+  </Tooltip>
 
-                    <IconButton onClick={() => handleDeletePoint(point.id)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </TableCell>
+  <span
+    style={{
+      color: "#ccc",
+      fontWeight: 300,
+      fontSize: "18px",
+      verticalAlign: "middle",
+    }}
+  >
+    |
+  </span>
+
+  <Tooltip title="Delete Point">
+    <IconButton
+      size="small"
+      onClick={() => handleDeletePoint(point.id)}
+      sx={{ color: "#d32f2f", ml: 0.5 }}
+    >
+      <DeleteIcon fontSize="small" />
+    </IconButton>
+  </Tooltip>
+</TableCell>
                 </TableRow>
               ))}
             </TableBody>

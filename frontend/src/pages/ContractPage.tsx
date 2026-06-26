@@ -5,6 +5,7 @@ import {
   TableBody, TableCell, TableContainer, TableHead, TableRow,
   TextField, Typography,
 } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useDispatch, useSelector } from "react-redux";
@@ -227,8 +228,36 @@ const ContractPage = () => {
                   </TableCell>
                   <TableCell>{getStatusChip(contract.endDate)}</TableCell>
                   <TableCell>
-                    <IconButton onClick={() => handleOpenEdit(contract)}><EditIcon /></IconButton>
-                    <IconButton onClick={() => handleDelete(contract)}><DeleteIcon /></IconButton>
+                    <Tooltip title="Edit Contract">
+  <IconButton
+    size="small"
+    onClick={() => handleOpenEdit(contract)}
+    sx={{ color: "#003A70", mr: 0.5 }}
+  >
+    <EditIcon fontSize="small" />
+  </IconButton>
+</Tooltip>
+
+<span
+  style={{
+    color: "#ccc",
+    fontWeight: 300,
+    fontSize: "18px",
+    verticalAlign: "middle",
+  }}
+>
+  |
+</span>
+
+<Tooltip title="Delete Contract">
+  <IconButton
+    size="small"
+    onClick={() => handleDelete(contract)}
+    sx={{ color: "#d32f2f", ml: 0.5 }}
+  >
+    <DeleteIcon fontSize="small" />
+  </IconButton>
+</Tooltip>
                   </TableCell>
                 </TableRow>
               ))}
